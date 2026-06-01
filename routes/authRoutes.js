@@ -1,27 +1,27 @@
-// Importing necessary libraries and modules
+// Import necessary modules and middleware
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const authMiddleware = require("../middleware/authMiddleware");
 
-// Creating a new router instance from Express to define authentication routes
+// Create a new router instance
 const router = express.Router();
 
 // POST /api/auth/register
 router.post("/register", async (req, res) => {
   try {
-    // Destructuring the name, email, password, and role from the request body
-    const { name, email, password} = req.body;
+    // Validate input
+    const { name, email, password } = req.body;
 
-    //
+    // Check if all required fields are provided
     if (!name || !email || !password) {
       return res.status(400).json({
         message: "Name, email, and password are required",
       });
     }
 
-    // Checking if a user with the provided email already exists in the database
+    // Check if a user with the same email already exists
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -30,18 +30,14 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    // Hashing the password using bcrypt with a salt round of 10 for security
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Creating a new user in the database with the provided name, email, hashed password, and role (assuming role is optional and defaults to "user" if not provided)
+    // Hash the password before saving
     const user = await User.create({
       name,
       email,
-      password: hashedPassword,
-      role: role || "user",
+      password,
     });
 
-    // Generating a JWT token for the newly registered user, including their ID and role in the payload, and signing it with a secret key from environment variables. The token is set to expire in 1 day.          
+    // Generate a JWT token for the newly registered user
     const token = jwt.sign(
       {
         id: user._id,
@@ -74,30 +70,27 @@ router.post("/register", async (req, res) => {
 // POST /api/auth/login
 router.post("/login", async (req, res) => {
   try {
-    // Destructuring the email and password from the request body
+    // Validate input
     const { email, password } = req.body;
 
+    // Check if email and password are provided
     if (!email || !password) {
       return res.status(400).json({
         message: "Email and password are required",
       });
     }
 
-    // Finding the user in the database by their email
+    // Find the user by email
     const user = await User.findOne({ email });
 
-    // If the user is not found, return a 401 Unauthorized response with a message indicating invalid email or password
+//
     if (!user) {
       return res.status(401).json({
         message: "Invalid email or password",
       });
     }
 
-    // Comparing the provided password with the hashed password stored in the database using bcrypt's compare function
-    const passwordIsValid = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const passwordIsValid = await bcrypt.compare(password, user.password);
 
     if (!passwordIsValid) {
       return res.status(401).json({
@@ -105,7 +98,6 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // Generating a JWT token for the authenticated user, including their ID and role in the payload, and signing it with a secret key from environment variables. The token is set to expire in 1 day.
     const token = jwt.sign(
       {
         id: user._id,
@@ -138,9 +130,7 @@ router.post("/login", async (req, res) => {
 // GET /api/auth/me
 router.get("/me", authMiddleware, async (req, res) => {
   try {
-    // Finding the user in the database by their ID, which is extracted from the decoded JWT token and attached to the request object by the authMiddleware. The password field is excluded from the returned user data for security reasons.
-    const user = await User.findById(req.user.id)
-      .select("-password");
+    const user = await User.findById(req.user.id).select("-password");
 
     if (!user) {
       return res.status(404).json({
@@ -157,5 +147,4 @@ router.get("/me", authMiddleware, async (req, res) => {
   }
 });
 
-//  Exporting the router to be used in other parts of the application, such as the main server file where it can be mounted on a specific path (e.g., /api/auth) to handle authentication-related routes.
 module.exports = router;
