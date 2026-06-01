@@ -10,9 +10,11 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 
 const authRoutes = require("./routes/authRoutes");
+
+app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use(cors());
-app.use(express.json());
+
 
 app.get("/", (req, res) => {
   res.send("R4B Studio CRM API is running");
