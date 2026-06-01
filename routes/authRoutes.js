@@ -90,6 +90,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // Compare the provided password with the hashed password in the database
     const passwordIsValid = await bcrypt.compare(password, user.password);
 
     if (!passwordIsValid) {
@@ -98,6 +99,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // Generate a JWT token for the authenticated user
     const token = jwt.sign(
       {
         id: user._id,
