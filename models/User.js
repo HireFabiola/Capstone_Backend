@@ -35,10 +35,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-
-// Compile the User model from the schema
-const User = mongoose.model("User", userSchema);
-
 // Pre-save middleware to hash the user's password before saving it to the database
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
@@ -53,5 +49,9 @@ userSchema.pre("save", async function (next) {
     next(error);
   }
 });
+
+// Compile the User model from the schema
+const User = mongoose.model("User", userSchema);
+
 // Export the User model
 module.exports = User;
