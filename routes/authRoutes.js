@@ -73,6 +73,7 @@ router.post("/login", async (req, res) => {
     // Validate input
     const { email, password } = req.body;
 
+      console.log("LOGIN BODY:", req.body);
     // Check if email and password are provided
     if (!email || !password) {
       return res.status(400).json({
@@ -82,6 +83,8 @@ router.post("/login", async (req, res) => {
 
     // Find the user by email
     const user = await User.findOne({ email });
+
+    console.log("USER FOUND:", user ? user.email : "No user found");
 
 //
     if (!user) {
