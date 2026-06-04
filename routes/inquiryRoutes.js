@@ -14,7 +14,8 @@ const router = express.Router();
 router
   .route("/")
   .get(authMiddleware, getInquiries)
-  .post(authMiddleware, createInquiry);
+  // No authentication required for creating an inquiry, as clients should be able to submit inquiries without needing to log in
+  .post(createInquiry);
 
 router
   .route("/:id")
