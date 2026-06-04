@@ -44,7 +44,7 @@ const createInquiry = async (req, res) => {
   try {
     const inquiry = await Inquiry.create({
       ...req.body,
-      owner: req.user.id,
+      owner: req.user?.id || process.env.DEFAULT_ADMIN_ID,
     });
 
     res.status(201).json(inquiry);
