@@ -42,18 +42,22 @@ const getInquiryById = async (req, res) => {
 // POST /api/inquiries
 const createInquiry = async (req, res) => {
   try {
+    console.log("PUBLIC INQUIRY BODY:", req.body);
+    console.log("DEFAULT_ADMIN_ID:", process.env.DEFAULT_ADMIN_ID);
     const inquiry = await Inquiry.create({
       ...req.body,
       owner: req.user?.id || process.env.DEFAULT_ADMIN_ID,
     });
 
     res.status(201).json(inquiry);
-  } catch (error) {
-    res.status(500).json({
-      message: "Error creating inquiry",
-      error: error.message,
-    });
-  }
+ } catch (error) {
+  console.error("CREATE INQUIRY ERROR:", error);
+
+  res.status(500).json({
+    message: "Error creating inquiry",
+    error: error.message,
+  });
+}
 };
 
 // PUT /api/inquiries/:id

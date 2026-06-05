@@ -24,5 +24,6 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/tasks", taskRoutes);
 
 app.listen(process.env.PORT, () => {
-  console.log("Server running");
+  console.log(`Server running on port ${process.env.PORT}`);
+  console.log("DEFAULT_ADMIN_ID:", process.env.DEFAULT_ADMIN_ID);
 });
